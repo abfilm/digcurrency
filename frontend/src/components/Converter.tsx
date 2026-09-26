@@ -4,10 +4,11 @@ import type { ConversionResult, Currency } from '../api/types';
 
 interface Props {
   currencies: Currency[];
+  from: string;
+  onFromChange: (code: string) => void;
 }
 
-export function Converter({ currencies }: Props) {
-  const [from, setFrom] = useState(currencies[0]?.code ?? '');
+export function Converter({ currencies, from, onFromChange }: Props) {
   const [to, setTo] = useState(currencies[1]?.code ?? currencies[0]?.code ?? '');
   const [amount, setAmount] = useState('1');
   const [result, setResult] = useState<ConversionResult | null>(null);
@@ -32,7 +33,7 @@ export function Converter({ currencies }: Props) {
       </label>
       <label>
         From
-        <select value={from} onChange={(e) => setFrom(e.target.value)}>
+        <select value={from} onChange={(e) => onFromChange(e.target.value)}>
           {currencies.map((c) => (
             <option key={c.code} value={c.code}>{c.code}</option>
           ))}

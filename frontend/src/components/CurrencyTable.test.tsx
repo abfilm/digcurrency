@@ -1,4 +1,6 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 import { CurrencyTable } from './CurrencyTable';
 import type { Currency } from '../api/types';
 
@@ -9,6 +11,8 @@ const btc: Currency = {
   usdRate: 65000,
   updatedAt: '2026-01-01T00:00:00Z',
 };
+
+const eth: Currency = { ...btc, code: 'ETH', name: 'Ether', usdRate: 3200 };
 
 describe('CurrencyTable', () => {
   it('renders a row per currency', () => {
@@ -23,5 +27,31 @@ describe('CurrencyTable', () => {
     render(<CurrencyTable currencies={[]} />);
 
     expect(screen.getByText('No currencies yet.')).toBeInTheDocument();
+  });
+
+  it('selects a currency when its row is clicked', async () => {
+    const onSelect = vi.fn();
+    render(<CurrencyTable currencies={[btc, eth]} onSelect={onSelect} />);
+
+    await userEvent.click(screen.getByText('Ether'));
+
+    expect(onSelect).toHaveBeenCalledWith('ETH');
+  });
+
+  it('selects a currency with the keyboard', async () => {
+    const onSelect = vi.fn();
+    render(<CurrencyTable currencies={[btc, eth]} onSelect={onSelect} />);
+
+    screen.getByText('Bitcoin').closest('tr')!.focus();
+    await userEvent.keyboard('{Enter}');
+
+    expect(onSelect).toHaveBeenCalledWith('BTC');
+  });
+
+  it('marks the selected row', () => {
+    render(<CurrencyTable currencies={[btc, eth]} selectedCode="ETH" onSelect={vi.fn()} />);
+
+    expect(screen.getByText('Ether').closest('tr')).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('Bitcoin').closest('tr')).toHaveAttribute('aria-selected', 'false');
   });
 });

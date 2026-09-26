@@ -8,7 +8,7 @@
 
 A full-stack showcase app for managing currencies and converting between them. It has a **Spring Boot REST API** and a **React** single-page frontend.
 
-![DigCurrency web UI: converting 0.5 BTC to EUR above the currency table](docs/images/screenshot.png)
+![DigCurrency web UI: the Ether row is selected in the currency table and the converter shows 2 ETH converted to EUR](docs/images/screenshot.png)
 
 DigCurrency handles three kinds of money side by side:
 
@@ -27,7 +27,7 @@ Every currency has a rate in US dollars (`usdRate`). DigCurrency converts betwee
 - **Exact money math:** all amounts use `BigDecimal` with 8 decimal places and banker's rounding (`HALF_EVEN`). No floating-point errors.
 - **Standard errors:** every error uses the [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `ProblemDetail` JSON format.
 - **Interactive API docs:** Swagger UI and an OpenAPI 3 spec are generated from the code.
-- **Web UI:** a React page with a currency table and a converter form.
+- **Web UI:** a React page with a currency table and a converter form. Click a row in the table (or press Enter on it) to use that currency as the converter's "From" currency.
 
 ## Tech stack
 

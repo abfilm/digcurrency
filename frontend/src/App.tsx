@@ -7,11 +7,15 @@ import { CurrencyTable } from './components/CurrencyTable';
 export default function App() {
   const [currencies, setCurrencies] = useState<Currency[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [from, setFrom] = useState('');
 
   useEffect(() => {
     currencyApi
       .list()
-      .then(setCurrencies)
+      .then((list) => {
+        setCurrencies(list);
+        setFrom(list[0]?.code ?? '');
+      })
       .catch((e: Error) => setError(e.message));
   }, []);
 
@@ -29,11 +33,11 @@ export default function App() {
         <main>
           <section>
             <h2>Convert</h2>
-            <Converter currencies={currencies} />
+            <Converter currencies={currencies} from={from} onFromChange={setFrom} />
           </section>
           <section>
             <h2>Currencies</h2>
-            <CurrencyTable currencies={currencies} />
+            <CurrencyTable currencies={currencies} selectedCode={from} onSelect={setFrom} />
           </section>
         </main>
       )}

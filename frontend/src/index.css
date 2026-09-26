@@ -9,6 +9,8 @@
   --fiat: #e7efff;
   --crypto: #fff1dd;
   --cbdc: #e3f6ec;
+  --row-hover: #f1f4fb;
+  --row-selected: #e4ebff;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -26,6 +28,8 @@
     --fiat: #22304f;
     --crypto: #45361f;
     --cbdc: #1f3d2d;
+    --row-hover: #20242d;
+    --row-selected: #26324f;
   }
 }
 
@@ -80,6 +84,24 @@ h2 {
 .currency-table .num {
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+.currency-table tr.selectable {
+  cursor: pointer;
+}
+
+.currency-table tr.selectable:hover {
+  background: var(--row-hover);
+}
+
+.currency-table tr.selectable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.currency-table tr.selected {
+  background: var(--row-selected);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .code {
