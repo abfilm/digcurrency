@@ -1,0 +1,136 @@
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --text: #16181d;
+  --muted: #5f6673;
+  --border: #e2e5ea;
+  --accent: #2f5bea;
+  --error: #c4312b;
+  --fiat: #e7efff;
+  --crypto: #fff1dd;
+  --cbdc: #e3f6ec;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111318;
+    --surface: #1a1d24;
+    --text: #e8eaee;
+    --muted: #9aa1ad;
+    --border: #2c313b;
+    --accent: #7c9bff;
+    --error: #ff7a73;
+    --fiat: #22304f;
+    --crypto: #45361f;
+    --cbdc: #1f3d2d;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+.app {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+h1 {
+  margin: 0 0 4px;
+}
+
+section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 24px;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--error);
+}
+
+.currency-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.currency-table th,
+.currency-table td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.currency-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.code {
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.badge-fiat { background: var(--fiat); }
+.badge-crypto { background: var(--crypto); }
+.badge-cbdc { background: var(--cbdc); }
+
+.converter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.converter label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.converter input,
+.converter select,
+.converter button {
+  font: inherit;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.converter button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.converter .result,
+.converter .error {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+}
