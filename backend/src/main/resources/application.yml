@@ -18,6 +18,10 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  http:
+    client:
+      connect-timeout: 5s
+      read-timeout: 10s
 
 management:
   endpoints:
@@ -32,3 +36,16 @@ springdoc:
 digcurrency:
   cors:
     allowed-origins: http://localhost:5173
+  rates:
+    enabled: true
+    refresh-interval: PT5M
+    coingecko:
+      base-url: https://api.coingecko.com/api/v3
+      api-key: ${COINGECKO_API_KEY:}
+      ids:
+        BTC: bitcoin
+        ETH: ethereum
+    ecb:
+      url: https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml
+    pegs:
+      EDEUR: EUR

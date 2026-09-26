@@ -48,6 +48,12 @@ public class Currency {
         this.updatedAt = Instant.now();
     }
 
+    /** Sets a new USD rate from a live rate source, keeping name and type. */
+    public void updateRate(BigDecimal usdRate) {
+        this.usdRate = usdRate;
+        this.updatedAt = Instant.now();
+    }
+
     public String getCode() {
         return code;
     }

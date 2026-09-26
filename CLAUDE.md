@@ -26,6 +26,7 @@ API docs while the backend runs: http://localhost:8080/swagger-ui.html (OpenAPI 
 - Money is `BigDecimal`, never `double`. Use explicit scale and `RoundingMode.HALF_EVEN`.
 - Constructor injection only, no field `@Autowired` in production code.
 - Demo data is loaded by `CurrencySeeder`, which is disabled in the `test` profile.
+- Live rates: `rates/` has one `RateProvider` per source (CoinGecko, ECB). `RateRefreshService` applies them, and `RateRefreshScheduler` runs at startup and every `digcurrency.rates.refresh-interval`. The scheduler is off in the `test` profile. Test providers with `MockRestServiceServer` and never call the live APIs.
 
 ## Frontend conventions (React 19, TypeScript, Vite)
 

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import App from './App';
@@ -24,5 +24,27 @@ describe('App', () => {
 
     expect(fromSelect).toHaveValue('ETH');
     expect(screen.getByText('Ether').closest('tr')).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('reloads rates every minute and keeps the selected "From" currency', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
+        new Response(JSON.stringify(currencies), { status: 200, headers: { 'Content-Type': 'application/json' } }),
+      );
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      render(<App />);
+      const fromSelect = await screen.findByLabelText('From');
+      await user.click(screen.getByText('Ether'));
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(60_000);
+      });
+
+      await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(2));
+      expect(fromSelect).toHaveValue('ETH');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

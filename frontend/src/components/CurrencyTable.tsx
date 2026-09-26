@@ -9,6 +9,7 @@ interface Props {
 }
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 6 });
+const time = new Intl.DateTimeFormat(undefined, { dateStyle: 'short', timeStyle: 'short' });
 
 export function CurrencyTable({ currencies, selectedCode, onSelect }: Props) {
   if (currencies.length === 0) {
@@ -23,6 +24,7 @@ export function CurrencyTable({ currencies, selectedCode, onSelect }: Props) {
           <th>Name</th>
           <th>Type</th>
           <th className="num">Value in USD</th>
+          <th className="num">Updated</th>
         </tr>
       </thead>
       <tbody>
@@ -50,6 +52,9 @@ export function CurrencyTable({ currencies, selectedCode, onSelect }: Props) {
               <span className={`badge badge-${c.type.toLowerCase()}`}>{c.type}</span>
             </td>
             <td className="num">{usd.format(c.usdRate)}</td>
+            <td className="num muted">
+              <time dateTime={c.updatedAt}>{time.format(new Date(c.updatedAt))}</time>
+            </td>
           </tr>
         ))}
       </tbody>

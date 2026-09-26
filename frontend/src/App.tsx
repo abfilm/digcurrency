@@ -4,19 +4,29 @@ import type { Currency } from './api/types';
 import { Converter } from './components/Converter';
 import { CurrencyTable } from './components/CurrencyTable';
 
+const REFRESH_MS = 60_000;
+
 export default function App() {
   const [currencies, setCurrencies] = useState<Currency[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [from, setFrom] = useState('');
 
   useEffect(() => {
-    currencyApi
-      .list()
-      .then((list) => {
-        setCurrencies(list);
-        setFrom(list[0]?.code ?? '');
-      })
-      .catch((e: Error) => setError(e.message));
+    function load() {
+      currencyApi
+        .list()
+        .then((list) => {
+          setCurrencies(list);
+          setError(null);
+          setFrom((current) => current || (list[0]?.code ?? ''));
+        })
+        .catch((e: Error) => setError(e.message));
+    }
+
+    load();
+    // The backend refreshes live rates periodically; pick them up without a page reload.
+    const timer = setInterval(load, REFRESH_MS);
+    return () => clearInterval(timer);
   }, []);
 
   return (

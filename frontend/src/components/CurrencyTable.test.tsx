@@ -21,6 +21,11 @@ describe('CurrencyTable', () => {
     expect(screen.getByText('BTC')).toBeInTheDocument();
     expect(screen.getByText('Bitcoin')).toBeInTheDocument();
     expect(screen.getByText('$65,000.00')).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Updated' })).toBeInTheDocument();
+    expect(screen.getByText('Bitcoin').closest('tr')!.querySelector('time')).toHaveAttribute(
+      'dateTime',
+      '2026-01-01T00:00:00Z',
+    );
   });
 
   it('shows an empty state', () => {

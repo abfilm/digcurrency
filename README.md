@@ -18,16 +18,17 @@ DigCurrency handles three kinds of money side by side:
 | `CRYPTO` | Cryptocurrency | BTC, ETH |
 | `CBDC` | Central bank digital currency | EDEUR (Digital Euro, demo) |
 
-Every currency has a rate in US dollars (`usdRate`). DigCurrency converts between any two currencies through USD.
+Every currency has a rate in US dollars (`usdRate`). DigCurrency converts between any two currencies through USD. Rates are live: crypto prices come from [CoinGecko](https://www.coingecko.com/) and fiat rates from the [European Central Bank](https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html).
 
 ## Features
 
 - **Currency management:** list, filter by type, create, update and delete currencies through a versioned REST API (`/api/v1`).
+- **Live rates:** the backend fetches current rates at startup and then every 5 minutes. See [Live exchange rates](#live-exchange-rates).
 - **Conversion:** convert an amount from any currency to any other. The API returns the exchange rate and the result.
 - **Exact money math:** all amounts use `BigDecimal` with 8 decimal places and banker's rounding (`HALF_EVEN`). No floating-point errors.
 - **Standard errors:** every error uses the [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `ProblemDetail` JSON format.
 - **Interactive API docs:** Swagger UI and an OpenAPI 3 spec are generated from the code.
-- **Web UI:** a React page with a currency table and a converter form. Click a row in the table (or press Enter on it) to use that currency as the converter's "From" currency.
+- **Web UI:** a React page with a currency table and a converter form. It reloads the rates every minute. Click a row in the table (or press Enter on it) to use that currency as the converter's "From" currency.
 
 ## Tech stack
 
@@ -46,6 +47,7 @@ digcurrency/
 │   └── src/main/java/com/digcurrency/
 │       ├── currency/         Currency entity, repository, service, controller, DTOs
 │       ├── conversion/       Conversion service and controller
+│       ├── rates/            Live rate sources (CoinGecko, ECB) and scheduled refresh
 │       ├── common/           Exceptions and global ProblemDetail handler
 │       └── config/           OpenAPI and CORS configuration
 ├── frontend/                 React + TypeScript SPA (Vite)
@@ -79,7 +81,7 @@ cd backend
 mvn spring-boot:run
 ```
 
-The API runs at **http://localhost:8080**. At startup it loads six demo currencies into the in-memory database. All data is reset each time the backend restarts.
+The API runs at **http://localhost:8080**. At startup it loads six currencies into the in-memory database and then replaces their rates with live ones. All data is reset each time the backend restarts.
 
 ### 2. Start the frontend
 
@@ -170,6 +172,36 @@ Errors come back as `ProblemDetail` JSON:
 | `400` | Invalid request body, negative conversion amount, or path/body code mismatch |
 | `404` | The currency doesn't exist |
 | `409` | A currency with that code already exists |
+
+## Live exchange rates
+
+| Source | Currencies | Notes |
+|---|---|---|
+| [CoinGecko](https://docs.coingecko.com/reference/simple-price) `/simple/price` | Crypto listed under `digcurrency.rates.coingecko.ids` (default: BTC, ETH) | Free public API, no key needed. It's rate-limited, so the default refresh interval is 5 minutes. |
+| [ECB euro reference rates](https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml) | EUR, USD, GBP and every other currency the ECB publishes | The ECB quotes units per 1 EUR, and the backend converts this to USD. The ECB publishes once per working day, around 16:00 CET. |
+| Pegs | EDEUR follows EUR 1:1 | Configured under `digcurrency.rates.pegs`. |
+
+How the refresh works:
+- A currency you create through the API gets live rates too, if one of the sources knows its code (for example `CHF` from the ECB).
+- A live refresh overwrites rates set through `PUT`. Currencies no source knows about keep the rate you set.
+- If a source can't be reached, its currencies keep their last rate and the backend logs a warning.
+- The `updatedAt` field shows when the backend last stored a rate, not when the source last published it.
+
+The settings are in `backend/src/main/resources/application.yml`:
+
+```yaml
+digcurrency:
+  rates:
+    enabled: true              # set to false to keep the seeded demo rates
+    refresh-interval: PT5M     # ISO-8601 duration
+    coingecko:
+      api-key: ${COINGECKO_API_KEY:}   # optional CoinGecko demo key for higher limits
+      ids:
+        BTC: bitcoin
+        ETH: ethereum
+```
+
+To track another crypto, add its code and [CoinGecko coin id](https://api.coingecko.com/api/v3/coins/list) under `ids`, then create the currency through the API. Tests never call the live sources.
 
 ## Running the tests
 
